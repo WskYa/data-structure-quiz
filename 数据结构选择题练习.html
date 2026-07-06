@@ -3798,6 +3798,17 @@ function resetRound() {
   currentCorrect = null;
 }
 
+// 进入错题重做模式：清除错题的已答记录，使它们可以重新作答
+function enterReviewMode() {
+  mode = 'review';
+  for (const id of wrongIds) {
+    delete answeredIds[id];
+  }
+  resetRound();
+  persist();
+  render();
+}
+
 // ===== RENDER =====
 const root = document.getElementById('app-root');
 
@@ -3877,7 +3888,7 @@ function buildModeBar() {
   const reviewBtn = document.createElement('button');
   reviewBtn.className = 'mode-btn' + (mode === 'review' ? ' active' : '');
   reviewBtn.innerHTML = `&#x1F504; 错题集 <span class="badge">${wrongIds.length}</span>`;
-  reviewBtn.onclick = () => { mode = 'review'; resetRound(); persist(); render(); };
+  reviewBtn.onclick = () => { enterReviewMode(); };
 
   div.appendChild(normalBtn);
   div.appendChild(keyBtn);
@@ -4023,7 +4034,7 @@ function buildEmptyState() {
         <div class="completion-title">${chTag}题目全部完成！</div>
         <div class="completion-sub">你已经做完了${chTag}所有选择题，可以切换到错题集复习错题</div>
         <button class="action-btn" onclick="chapterFilter=0;resetRound();persist();render();">&#x1F50D; 查看全部章节</button>
-        <button class="action-btn" style="margin-top:8px" onclick="mode='review';resetRound();persist();render();">&#x1F504; 进入错题集 (${wrongIds.length})</button>
+        <button class="action-btn" style="margin-top:8px" onclick="enterReviewMode()">&#x1F504; 进入错题集 (${wrongIds.length})</button>
       </div>
     `;
   }
@@ -4052,7 +4063,7 @@ function buildCompletionPanel(stats) {
     ${allCorrect ? `
       <button class="action-btn" onclick="mode='normal';resetRound();persist();render();">&#x1F504; 再练一轮</button>
     ` : `
-      <button class="action-btn" onclick="mode='review';resetRound();persist();render();">&#x1F504; 进入错题集复习 (${stats.wrong})</button>
+      <button class="action-btn" onclick="enterReviewMode()">&#x1F504; 进入错题集复习 (${stats.wrong})</button>
       <button class="action-btn secondary" onclick="mode='normal';resetRound();persist();render();">&#x1F4DD; 重新练习全部</button>
     `}
     <div style="margin-top:16px">
